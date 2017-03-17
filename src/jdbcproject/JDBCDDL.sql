@@ -1,24 +1,24 @@
 CREATE TABLE writinggroups(
-    groupname   VARCHAR(30) NOT NULL,
-    headwriter  VARCHAR(30),
+    groupname   VARCHAR(50) NOT NULL,
+    headwriter  VARCHAR(50),
     yearformed  INTEGER,
-    subject     VARCHAR(30),
+    subject     VARCHAR(50),
     CONSTRAINT writinggroups_pk  PRIMARY KEY (groupname)
 );
 
 CREATE TABLE publishers(
-    publishername       VARCHAR(30) NOT NULL,
-    publisheraddress    VARCHAR(30),
-    publisherphone      VARCHAR(20),
-    publihseremail      VARCHAR(20),
+    publishername       VARCHAR(50) NOT NULL,
+    publisheraddress    VARCHAR(50),
+    publisherphone      CHAR(12),
+    publihseremail      VARCHAR(50),
     CONSTRAINT publishers_pk  PRIMARY KEY (publishername)
 );
 
 
 CREATE TABLE books(
-    booktitle       VARCHAR(30) NOT NULL,
-    groupname   VARCHAR(30) NOT NULL,
-    publishername       VARCHAR(30) NOT NULL,
+    booktitle       VARCHAR(50) NOT NULL,
+    groupname   VARCHAR(50) NOT NULL,
+    publishername       VARCHAR(50) NOT NULL,
     yearpublished   INTEGER,
     numberpages     INTEGER,
 
@@ -26,3 +26,16 @@ CREATE TABLE books(
     CONSTRAINT books_ibfk_1 FOREIGN KEY (groupname) REFERENCES writinggroups (groupname),
     CONSTRAINT books_ibfk_2 FOREIGN KEY (publishername) REFERENCES publishers (publishername)
 );
+
+
+INSERT INTO writinggroups
+VALUES ('Rowling et al', 'JK Rowling', 1996, 'Fantasy'),
+('Happy Gilmore', 'Adam Sandler', 1996, 'Comedy');
+
+INSERT INTO publishers
+VALUES ('Pearson', '666 Monopoly Rd', '866-842-7428', 'aimswebsupport@pearson.com'),
+('Penguin Random House', '1734 Broadway Blvd', '800-733-3000', 'atrandompublicity@randomhouse.com');
+
+INSERT INTO books
+VALUES ('Harry Potter and the Chamber of Secrets', 'Rowling et al', 'Pearson', 2000, 630 ),
+('The Novelization of Billy Madison', 'Happy Gilmore', 'Penguin Random House', 2002, 420 );
