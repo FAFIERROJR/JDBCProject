@@ -10,15 +10,15 @@ CREATE TABLE publishers(
     publishername       VARCHAR(50) NOT NULL,
     publisheraddress    VARCHAR(50),
     publisherphone      CHAR(12),
-    publihseremail      VARCHAR(50),
+    publisheremail      VARCHAR(50),
     CONSTRAINT publishers_pk  PRIMARY KEY (publishername)
 );
 
 
 CREATE TABLE books(
     booktitle       VARCHAR(50) NOT NULL,
-    groupname   VARCHAR(50) NOT NULL,
-    publishername       VARCHAR(50) NOT NULL,
+    groupname       VARCHAR(50) NOT NULL REFERENCES writinggroups(groupname),
+    publishername   VARCHAR(50) NOT NULL REFERENCES publishers(publishername),
     yearpublished   INTEGER,
     numberpages     INTEGER,
 
