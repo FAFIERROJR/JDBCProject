@@ -33,10 +33,12 @@ public class JDBCProject {
             //write menu stuff in here
             
             //this stuff is just for testing
+            //viewtable just shows the one table. So we can use it for writing groups and publishers
             viewTable(conn, "writinggroups");
             viewGroup(conn, "Happy Gilmore");
             viewTable(conn, "publishers");
             viewPublisher(conn, "Pearson");
+            //this is a special function for viewing just book titles
             viewBookTitles(conn);
             viewBook(conn, "Harry Potter and the Chamber of Secrets", "Rowling et al", "Pearson");
             //removeBook(conn, "Harry Potter and the Prisoner of Azkaban", "Rowling et al", "Pearson");
