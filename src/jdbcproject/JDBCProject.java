@@ -32,58 +32,134 @@ public class JDBCProject {
             
             //write menu stuff in here
             Scanner in = new Scanner(System.in);
-            int numMenuChoices = 10;
             int menuChoice;
             
 
             do{
                 displayMenu();
                 menuChoice = in.nextInt();
+                int menuChoices = 10;
                 
                 String groupname, pubname, booktitle;
+                int yearpublished, numpages;
+                String pubaddress, pubphone, pubemail, oldpubname;
                 switch(menuChoice){
                 case 1:
                     viewTable(conn, "groupname", "writinggroups");
                     break;
                 case 2:
-                    System.out.println("Please enter the group name");
-                    groupname = in.nextLine();
+                    in.nextLine();
+                    do{
+                        System.out.println("Please enter the group name");
+                        groupname = in.nextLine();
+                    }while(!validate(conn, "groupname", groupname, "writinggroups"));
                     viewGroup(conn, groupname);
                     break;
                 case 3:
-                    viewTable(conn, "publishername", "writinggroups");
+                    viewTable(conn, "publishername", "publishers");
                     break;
                 case 4:
-                    System.out.println("Please enter the publisher name");
-                    pubname = in.nextLine();
-                    viewGroup(conn, pubname);
+                    in.nextLine();
+                    do{
+                        System.out.println("Please enter the publisher name");
+                        pubname = in.nextLine();
+                    }while(!validate(conn, "publishername", pubname, "publishers"));
+                    viewPublisher(conn, pubname);
                     break;
                 case 5:
                     viewBookTitles(conn);
                     break;
                 case 6:
+                    in.nextLine();
+                    do{
+                        System.out.println("Please enter the book title");
+                        booktitle = in.nextLine();
+                    }while(!validate(conn, "booktitle", booktitle, "books"));
+                    do{
+                        System.out.println("Please enter the group name");
+                        groupname = in.nextLine();
+                    }while(!validateBookGroup(conn, booktitle, groupname));
+                    do{
+                        System.out.println("Please enter the publisher name");
+                        pubname = in.nextLine();
+                    }while(!validateBookGroupPub(conn, booktitle, groupname, pubname));
+                    viewBook(conn, booktitle, groupname, pubname);
+                    break;
+                case 7:
+                    in.nextLine();
                     System.out.println("Please enter the book title");
                     booktitle = in.nextLine();
-                    System.out.println("Please enter the writing group name");
-                    groupname = in.nextLine();
-                    System.out.println("Please enter the publisher name");
-                    pubname = in.nextLine();
-                    viewBook(conn, booktitle, groupname, pubname);
-                case 7:
+                    do{
+                        System.out.println("Please enter the group name");
+                        groupname = in.nextLine();
+                    }while(!validateBookGroup(conn, booktitle, groupname));
+                    do{
+                        System.out.println("Please enter the publisher name");
+                        pubname = in.nextLine();
+                    }while(!validateBookGroupPub(conn, booktitle, groupname, pubname));
+                    System.out.println("Please enter the year published (4-digits)");
+                    do{
+                        yearpublished = in.nextInt();
+                        if(yearpublished <0 ){
+                            System.out.println("Please enter a positive number");
+                        }
+                    }while(yearpublished <= 0);
+                    System.out.println("Please enter the number of pages");
+                    do{
+                        numpages = in.nextInt();
+                        System.out.println("Please enter a positive number");
+                    }while(numpages < 0);
+                    insertBook(conn, booktitle, groupname, pubname, yearpublished, numpages);
                     break;
                 case 8:
+                    in.nextLine();
+                    System.out.println("Please enter the new publisher name");
+                    pubname = in.nextLine();
+                    System.out.println("Please enter the new publisher address");
+                    pubaddress = in.nextLine();
+                    System.out.println("Please enter the new publisher phone");
+                    pubphone = in.nextLine();
+                    System.out.println("Please enter the new publisher email");
+                    pubemail = in.nextLine();
+                    do{
+                        System.out.println("Please enter the old publisher name");
+                        oldpubname = in.nextLine();
+                    }while(!validate(conn, "publishername", oldpubname, "publishers"));
+                    
+                    ArrayList<String> newpub = new ArrayList<String>();
+                    newpub.add(pubname);
+                    newpub.add(pubaddress);
+                    newpub.add(pubphone);
+                    newpub.add(pubemail);
+                    
+                    insertPub(conn, newpub, oldpubname);
+                    
                     break;
                 case 9:
+                    in.nextLine();
+                    do{
+                        System.out.println("Please enter the book title");
+                        booktitle = in.nextLine();
+                    }while(!validate(conn, "booktitle", booktitle, "books"));
+                    do{
+                        System.out.println("Please enter the group name");
+                        groupname = in.nextLine();
+                    }while(!validateBookGroup(conn, booktitle, groupname));
+                    do{
+                        System.out.println("Please enter the publisher name");
+                        pubname = in.nextLine();
+                    }while(!validateBookGroupPub(conn, booktitle, groupname, pubname));
+                    removeBook(conn, booktitle, groupname, pubname);
                     break;
                 case 10:
                     System.out.println("Thanks for using this app! Goodbye!");
                     conn.close();
                     System.exit(0);
                 default:
-                    System.out.print("Please enter an integer between 1 and " + menuChoices);
+                    System.out.println("Please enter an integer between 1 and " + menuChoices);
                     break;
                 }
-            }while(menuChoice < 0 || menuChoice > numMenuChoices);
+            }while(true);
 
 //            //this stuff is just for testing
 //            //viewtable just shows the one table. So we can use it for writing groups and publishers
@@ -105,7 +181,6 @@ public class JDBCProject {
 //            insertPub(conn, newPub, "Penguin Random House" );
 //            viewTable(conn, "publishers");
             
-            conn.close();
         }
         catch (Exception except)
         {
@@ -339,6 +414,75 @@ public class JDBCProject {
             Logger.getLogger(JDBCProject.class.getName()).log(Level.SEVERE, null, ex);
         } 
         
+        return false;
+    }
+    
+    public static boolean validate(Connection conn, String attribute, String value, String table){
+        try {
+            String query = "SELECT 1 FROM " + table + " WHERE " + attribute + " = ?";
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setString(1, value);
+            ResultSet rs = pstmt.executeQuery();
+            
+            int count = 0;
+            while(rs.next()){
+                count++;
+            }
+            if(count > 0){
+                return true;
+            }
+            System.out.println(value + " is not an existing " + attribute + ". Please try again.");
+            return false;
+        } catch (SQLException ex) {
+            Logger.getLogger(JDBCProject.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+    
+    public static boolean validateBookGroup(Connection conn, String booktitle, String groupname){
+        try {
+            String query = "SELECT 1 FROM books WHERE booktitle = ? AND groupname = ?";
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setString(1, booktitle);
+            pstmt.setString(2, groupname);
+            ResultSet rs = pstmt.executeQuery();
+            
+            int count = 0;
+            while(rs.next()){
+                count++;
+            }
+            if(count > 0){
+                return true;
+            }
+            System.out.println("There are no entries with that book title by that writing group. Please try again.");
+            return false;
+        } catch (SQLException ex) {
+            Logger.getLogger(JDBCProject.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+    
+    public static boolean validateBookGroupPub(Connection conn, String booktitle, String groupname, String publishername){
+        try {
+            String query = "SELECT 1 FROM books WHERE booktitle = ? AND groupname = ? AND publishername = ?";
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setString(1, booktitle);
+            pstmt.setString(2, groupname);
+            pstmt.setString(3, publishername);
+            ResultSet rs = pstmt.executeQuery();
+            
+            int count = 0;
+            while(rs.next()){
+                count++;
+            }
+            if(count > 0){
+                return true;
+            }
+            System.out.println(publishername + " does produce any matches with the book and writing group given. Please try again.");
+            return false;
+        } catch (SQLException ex) {
+            Logger.getLogger(JDBCProject.class.getName()).log(Level.SEVERE, null, ex);
+        }
         return false;
     }
 }
