@@ -55,7 +55,7 @@ VALUES ('Pearson', '666 Monopoly Rd', '8668427428', 'aimswebsupport@pearson.com'
 
 INSERT INTO books
 VALUES ('Harry Potter and the Chamber of Secrets', 'Rowling et al', 'Pearson', 2000, 630 ),
-('The Novelization of Billy Madison', 'Happy Gilmore', 'Penguin Random House', 2002, 420 ),
+('The Novelization of Billy Madison', 'Happy Gilmore-reading', 'Penguin Random House', 2002, 420 ),
 ('The Shinning', 'Silence of the books', 'Anchor', 2012,688),
 ('The Beatles Anthology', 'All you need is a book', 'Chronicle Books', 2000, 368),
 ('Star Wars-A New Hope', 'Star Books', 'Marvel', 2015, 128),
