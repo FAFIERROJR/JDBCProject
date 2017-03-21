@@ -32,12 +32,19 @@ public class JDBCProject {
             
             //write menu stuff in here
             Scanner in = new Scanner(System.in);
-            int menuChoice;
+            int menuChoice = -1101;
             
 
             do{
-                displayMenu();
-                menuChoice = in.nextInt();
+                do{
+                    try{
+                        displayMenu();
+                        menuChoice = in.nextInt();
+                    }catch(InputMismatchException e){
+                        String clear = in.nextLine();
+                        System.out.println("Please enter an integer");
+                    }
+                }while(menuChoice == -1101);
                 int menuChoices = 10;
                 
                 String groupname, pubname, booktitle;
@@ -79,11 +86,7 @@ public class JDBCProject {
                         System.out.println("Please enter the group name");
                         groupname = in.nextLine();
                     }while(!validateBookGroup(conn, booktitle, groupname));
-                    do{
-                        System.out.println("Please enter the publisher name");
-                        pubname = in.nextLine();
-                    }while(!validateBookGroupPub(conn, booktitle, groupname, pubname));
-                    viewBook(conn, booktitle, groupname, pubname);
+                    viewBook(conn, booktitle, groupname);
                     break;
                 case 7:
                     in.nextLine();
@@ -110,7 +113,7 @@ public class JDBCProject {
                         System.out.println("Please enter a positive number");
                     }while(numpages < 0);
                     
-                    if(!checkDuplicateBookGroupPub(conn, booktitle, groupname, pubname)){
+                    if(!checkDuplicateBookGroup(conn, booktitle, groupname)){
                         insertBook(conn, booktitle, groupname, pubname, yearpublished, numpages);
                     }
                     
@@ -157,11 +160,7 @@ public class JDBCProject {
                         System.out.println("Please enter the group name");
                         groupname = in.nextLine();
                     }while(!validateBookGroup(conn, booktitle, groupname));
-                    do{
-                        System.out.println("Please enter the publisher name");
-                        pubname = in.nextLine();
-                    }while(!validateBookGroupPub(conn, booktitle, groupname, pubname));
-                    removeBook(conn, booktitle, groupname, pubname);
+                    removeBook(conn, booktitle, groupname);
                     break;
                 case 10:
                     System.out.println("Thanks for using this app! Goodbye!");
@@ -227,13 +226,12 @@ public class JDBCProject {
         return false;
     }
     
-    public static boolean checkDuplicateBookGroupPub(Connection conn, String booktitle, String groupname, String publishername){
+    public static boolean checkDuplicateBookGroup(Connection conn, String booktitle, String groupname){
         try {
-            String query = "SELECT 1 FROM books WHERE booktitle = ? AND groupname = ? AND publishername = ?";
+            String query = "SELECT 1 FROM books WHERE booktitle = ? AND groupname = ?";
             PreparedStatement pstmt = conn.prepareStatement(query);
             pstmt.setString(1, booktitle);
             pstmt.setString(2, groupname);
-            pstmt.setString(3, publishername);
             ResultSet rs = pstmt.executeQuery();
             
             int count = 0;
@@ -297,14 +295,13 @@ public class JDBCProject {
         }     
     }
     
-    public static void viewBook(Connection conn, String title, String groupname, String publisher){
+    public static void viewBook(Connection conn, String title, String groupname){
         try {
             PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM BOOKS "
                     + "NATURAL JOIN writinggroups NATURAL JOIN publishers "
-                    + "WHERE booktitle = ? AND groupname = ? AND publishername = ?" );
+                    + "WHERE booktitle = ? AND groupname = ?" );
             pstmt.setString(1, title);
             pstmt.setString(2, groupname);
-            pstmt.setString(3, publisher);
             ResultSet rs = pstmt.executeQuery();
             ResultSetMetaData rsmd = rs.getMetaData();
             
@@ -463,15 +460,13 @@ public class JDBCProject {
         }
     }
     
-    public static boolean removeBook(Connection conn, String title, String gName, String pName){
+    public static boolean removeBook(Connection conn, String title, String gName){
         try {
             PreparedStatement pstmt = conn.prepareStatement("DELETE FROM books "
                     + "WHERE booktitle = ? AND "
-                    + "groupname = ? AND "
-                    + "publishername = ?");
+                    + "groupname = ?");
             pstmt.setString(1, title);
             pstmt.setString(2, gName);
-            pstmt.setString(3, pName);
             pstmt.execute();
             pstmt.close();
             return true;
