@@ -434,8 +434,6 @@ public class JDBCProject {
             PreparedStatement pstmt2 = conn.prepareStatement("UPDATE books "
                     + "SET publishername = ? "
                     + "WHERE publishername = ?");
-            PreparedStatement pstmt3 = conn.prepareStatement("DELETE FROM publishers "
-                    + "WHERE publishername = ?");
                     
             pstmt1.setString(1, newPub.get(0));
             pstmt1.setString(2, newPub.get(1));
@@ -443,16 +441,13 @@ public class JDBCProject {
             pstmt1.setString(4, newPub.get(3));
             pstmt2.setString(1, newPub.get(0));
             pstmt2.setString(2, oldPubName);
-            pstmt3.setString(1, oldPubName);
             
             pstmt1.execute();
             pstmt2.execute();
-            pstmt3.execute();
 
        ;
             pstmt1.close();
             pstmt2.close();
-            pstmt3.close();
             return true;
         } catch (SQLException ex) {
             Logger.getLogger(JDBCProject.class.getName()).log(Level.SEVERE, null, ex);
