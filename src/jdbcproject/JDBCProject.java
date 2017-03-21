@@ -92,11 +92,11 @@ public class JDBCProject {
                     do{
                         System.out.println("Please enter the group name");
                         groupname = in.nextLine();
-                    }while(!validateBookGroup(conn, booktitle, groupname));
+                    }while(!validate(conn, "groupname", groupname, "writinggroups"));
                     do{
                         System.out.println("Please enter the publisher name");
                         pubname = in.nextLine();
-                    }while(!validateBookGroupPub(conn, booktitle, groupname, pubname));
+                    }while(!validate(conn, "publishername", pubname, "publishers"));
                     System.out.println("Please enter the year published (4-digits)");
                     do{
                         yearpublished = in.nextInt();
