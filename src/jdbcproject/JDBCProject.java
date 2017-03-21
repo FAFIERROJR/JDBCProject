@@ -109,12 +109,19 @@ public class JDBCProject {
                         numpages = in.nextInt();
                         System.out.println("Please enter a positive number");
                     }while(numpages < 0);
-                    insertBook(conn, booktitle, groupname, pubname, yearpublished, numpages);
+                    
+                    if(!checkDuplicateBookGroupPub(conn, booktitle, groupname, pubname)){
+                        insertBook(conn, booktitle, groupname, pubname, yearpublished, numpages);
+                    }
+                    
                     break;
                 case 8:
                     in.nextLine();
-                    System.out.println("Please enter the new publisher name");
-                    pubname = in.nextLine();
+                    do{
+                        System.out.println("Please enter the new publisher name");
+                        pubname = in.nextLine();
+                        
+                    }while(checkDuplicate(conn ,"publishername", pubname, "publishers"));
                     System.out.println("Please enter the new publisher address");
                     pubaddress = in.nextLine();
                     do{
@@ -194,6 +201,59 @@ public class JDBCProject {
         
         
     }
+    
+    public static boolean checkDuplicate(Connection conn, String attribute, String value, String table){
+        try {
+            String query = "SELECT 1 FROM " + table + " WHERE " + attribute + " = ?";
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setString(1, value);
+            ResultSet rs = pstmt.executeQuery();
+            
+            int count = 0;
+            while(rs.next()){
+                count++;
+            }
+            if(count > 0){
+                System.out.println(value + " is an already existing " + attribute + ". Please try again.");
+                return true;
+            }
+        
+            rs.close();
+            pstmt.close();
+            return false;
+        } catch (SQLException ex) {
+            Logger.getLogger(JDBCProject.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+    
+    public static boolean checkDuplicateBookGroupPub(Connection conn, String booktitle, String groupname, String publishername){
+        try {
+            String query = "SELECT 1 FROM books WHERE booktitle = ? AND groupname = ? AND publishername = ?";
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setString(1, booktitle);
+            pstmt.setString(2, groupname);
+            pstmt.setString(3, publishername);
+            ResultSet rs = pstmt.executeQuery();
+            
+            int count = 0;
+            while(rs.next()){
+                count++;
+            }
+            if(count > 0){
+                System.out.println("Sorry. This book already exists in the database. Please try again.");
+                return true;
+            }
+            
+            rs.close();
+            pstmt.close();
+            return false;
+        } catch (SQLException ex) {
+            Logger.getLogger(JDBCProject.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+    
     
     public static void displayMenu(){
         String menu = "1. List all writing groups"
@@ -419,7 +479,8 @@ public class JDBCProject {
             Logger.getLogger(JDBCProject.class.getName()).log(Level.SEVERE, null, ex);
         } 
         
-        return false;
+    
+            return false;
     }
     
     public static boolean validate(Connection conn, String attribute, String value, String table){
