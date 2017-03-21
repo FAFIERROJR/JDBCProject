@@ -42,6 +42,7 @@ public class JDBCProject {
                         menuChoice = in.nextInt();
                     }catch(InputMismatchException e){
                         String clear = in.nextLine();
+                        menuChoice = -1101;
                         System.out.println("Please enter an integer");
                     }
                 }while(menuChoice == -1101);
