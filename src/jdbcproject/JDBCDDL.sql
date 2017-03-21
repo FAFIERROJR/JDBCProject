@@ -22,9 +22,9 @@ CREATE TABLE books(
     yearpublished   INTEGER,
     numberpages     INTEGER,
 
-    CONSTRAINT books_pk PRIMARY KEY (booktitle, groupname, publishername),
-    CONSTRAINT books_ibfk_1 FOREIGN KEY (groupname) REFERENCES writinggroups (groupname),
-    CONSTRAINT books_ibfk_2 FOREIGN KEY (publishername) REFERENCES publishers (publishername)
+    CONSTRAINT books_pk PRIMARY KEY (booktitle, groupname),
+    CONSTRAINT books_fk_1 FOREIGN KEY (groupname) REFERENCES writinggroups (groupname),
+    CONSTRAINT books_fk_2 FOREIGN KEY (publishername) REFERENCES publishers (publishername)
 );
 
 
