@@ -117,8 +117,13 @@ public class JDBCProject {
                     pubname = in.nextLine();
                     System.out.println("Please enter the new publisher address");
                     pubaddress = in.nextLine();
-                    System.out.println("Please enter the new publisher phone");
-                    pubphone = in.nextLine();
+                    do{
+                        System.out.println("Please enter the new publisher phone");
+                        pubphone = in.nextLine();
+                        if(pubphone.length() < 10){
+                            System.out.println("Please enter a 10-digit phone number");
+                        }
+                    }while(pubphone.length() < 10);
                     System.out.println("Please enter the new publisher email");
                     pubemail = in.nextLine();
                     do{
@@ -432,6 +437,8 @@ public class JDBCProject {
                 return true;
             }
             System.out.println(value + " is not an existing " + attribute + ". Please try again.");
+            rs.close();
+            pstmt.close();
             return false;
         } catch (SQLException ex) {
             Logger.getLogger(JDBCProject.class.getName()).log(Level.SEVERE, null, ex);
@@ -455,6 +462,8 @@ public class JDBCProject {
                 return true;
             }
             System.out.println("There are no entries with that book title by that writing group. Please try again.");
+            rs.close();
+            pstmt.close();
             return false;
         } catch (SQLException ex) {
             Logger.getLogger(JDBCProject.class.getName()).log(Level.SEVERE, null, ex);
@@ -479,6 +488,9 @@ public class JDBCProject {
                 return true;
             }
             System.out.println(publishername + " does produce any matches with the book and writing group given. Please try again.");
+            
+            rs.close();
+            pstmt.close();
             return false;
         } catch (SQLException ex) {
             Logger.getLogger(JDBCProject.class.getName()).log(Level.SEVERE, null, ex);
